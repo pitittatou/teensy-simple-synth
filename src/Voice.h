@@ -1,15 +1,17 @@
 #ifndef voice_h_
 #define voice_h_
 
-#include "ADSREnvelope.h"
+#include <memory>
+
 #include "Synth.h"
-#include "TriangleWave.h"
+#include "envelopes/Envelope.h"
+#include "waveforms/Waveform.h"
 
 class Synth;
 
 class Voice {
    public:
-    Voice(int SR, Synth& synth);
+    Voice(int SR, std::unique_ptr<Waveform>&& waveform, std::unique_ptr<Envelope>&& envelope, Synth& synth);
 
     void startNote(float f, int v, int a);
     void endNote();
@@ -21,8 +23,8 @@ class Voice {
     void setAge(int a);
 
    private:
-    TriangleWave triangle;
-    ADSREnvelope envelope;
+    std::unique_ptr<Waveform> waveform;
+    std::unique_ptr<Envelope> envelope;
     float gain;
     float frequency;
     int samplingRate;

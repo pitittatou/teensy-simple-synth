@@ -6,7 +6,7 @@
 #include <math.h>
 
 ADSREnvelope::ADSREnvelope(int SR, float attackRate, float decayRate, float sustainLevel,
-                           float releaseRate, float targetRatioA, float targetRatioDR) : sampleRate(SR),
+                           float releaseRate, float targetRatioA, float targetRatioDR) : Envelope(SR),
                                                                                          state(State::IDLE) {
     setAttackRate(attackRate);
     setDecayRate(decayRate);

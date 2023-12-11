@@ -3,15 +3,17 @@
 #define AUDIO_OUTPUTS 1
 
 #define MULT_16 32767
-#define VOICE_NB 16
 
 Synth::Synth() : AudioStream(AUDIO_OUTPUTS, new audio_block_t*[AUDIO_OUTPUTS]),
-                 voices(VOICE_NB, Voice(AUDIO_SAMPLE_RATE_EXACT, *this)),
                  maxAge(-1) {}
+
+void Synth::setVoices(std::unique_ptr<std::vector<Voice>>&& voices) {
+    this->voices = std::move(voices);
+}
 
 void Synth::freeVoice(int age) {
     int voice_age;
-    for (Voice& voice : voices) {
+    for (Voice& voice : *voices) {
         voice_age = voice.getAge();
         if (voice_age > age) {
             voice.setAge(voice_age - 1);
@@ -21,16 +23,16 @@ void Synth::freeVoice(int age) {
 }
 
 void Synth::startNote(float f, int v) {
-    for (int i = 0; i < voices.size(); i++) {
-        if (voices[i].isAvailable()) {
-            voices[i].startNote(f, v, ++maxAge);
+    for (Voice& voice : *voices) {
+        if (voice.isAvailable()) {
+            voice.startNote(f, v, ++maxAge);
             return;
         }
     }
 
     // If we get here, that means all voices are unavailable
     // We steal the oldest one
-    for (Voice& voice : voices) {
+    for (Voice& voice : *voices) {
         if (voice.getAge() == 0) {
             voice.startNote(f, v, maxAge);
         } else {
@@ -40,7 +42,7 @@ void Synth::startNote(float f, int v) {
 }
 
 void Synth::endNote(float f) {
-    for (Voice& voice : voices) {
+    for (Voice& voice : *voices) {
         if (voice.getFrequency() == f && !voice.isReleased()) {
             voice.endNote();
         }
@@ -54,7 +56,7 @@ void Synth::update(void) {
         if (outBlock[channel]) {
             for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
                 float currentSample = 0.0;
-                for (Voice& voice : voices) {
+                for (Voice& voice : *voices) {
                     currentSample += voice.tick();
                 }
                 currentSample /= VOICE_NB;

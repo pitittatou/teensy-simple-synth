@@ -1,14 +1,16 @@
-#ifndef adsr_envelope_h_
-#define adsr_envelope_h_
+#include "Envelope.h"
 
-class ADSREnvelope {
+#ifndef adsr_envelope_h_
+    #define adsr_envelope_h_
+
+class ADSREnvelope : public Envelope {
    public:
     ADSREnvelope(int SR, float attackRate, float decayRate, float sustainLevel, float releaseRate, float targetRatioA, float targetRatioDR);
 
-    float tick();
-    void startNote();
-    void endNote();
-    bool isIdle();
+    float tick() override;
+    void startNote() override;
+    void endNote() override;
+    bool isIdle() override;
 
    private:
     enum class State {
@@ -19,7 +21,6 @@ class ADSREnvelope {
         RELEASE
     };
 
-    int sampleRate;
     State state;
     float output;
     float attackRate;
