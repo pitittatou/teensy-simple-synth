@@ -5,11 +5,10 @@
 #include <vector>
 
 #include "Arduino.h"
+#include "Arpeggiator.h"
 #include "Audio.h"
 #include "AudioStream.h"
 #include "Voice.h"
-#include "Arpeggiator.h"
-
 
 #define VOICE_NB 16
 

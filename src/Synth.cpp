@@ -5,7 +5,7 @@
 #define MULT_16 32767
 
 Synth::Synth() : AudioStream(AUDIO_OUTPUTS, new audio_block_t*[AUDIO_OUTPUTS]),
-                arpeggiator(std::make_unique<Arpeggiator>(AUDIO_SAMPLE_RATE_EXACT, *this, 0.3, 0.5, Arpeggiator::Mode::UP)),
+                 arpeggiator(std::make_unique<Arpeggiator>(AUDIO_SAMPLE_RATE_EXACT, *this, 0.3, 0.5, Arpeggiator::Mode::UP)),
                  maxAge(-1) {}
 
 void Synth::setVoices(std::unique_ptr<std::vector<Voice>>&& voices) {

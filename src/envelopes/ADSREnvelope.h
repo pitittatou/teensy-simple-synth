@@ -1,7 +1,7 @@
-#include "Envelope.h"
-
 #ifndef adsr_envelope_h_
-    #define adsr_envelope_h_
+#define adsr_envelope_h_
+
+#include "Envelope.h"
 
 class ADSREnvelope : public Envelope {
    public:
