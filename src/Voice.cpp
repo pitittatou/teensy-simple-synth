@@ -1,5 +1,7 @@
 #include "Voice.h"
 
+#include <cmath>
+
 Voice::Voice(int SR, std::unique_ptr<Waveform>&& waveform,
              std::unique_ptr<Envelope>&& envelope, Synth& synth) : waveform(std::move(waveform)),
                                                                    envelope(std::move(envelope)),
@@ -24,7 +26,7 @@ void Voice::startNote(float f, int v, int a) {
     setFrequency(f);
     envelope->startNote();
     age = a;
-    gain = v / 127.0;
+    gain = std::pow(v / 127.0, 2);
     available = false;
     released = false;
 }

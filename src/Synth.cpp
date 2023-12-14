@@ -5,6 +5,7 @@
 #define MULT_16 32767
 
 Synth::Synth() : AudioStream(AUDIO_OUTPUTS, new audio_block_t*[AUDIO_OUTPUTS]),
+                arpeggiator(std::make_unique<Arpeggiator>(AUDIO_SAMPLE_RATE_EXACT, *this, 0.3, 0.5, Arpeggiator::Mode::UP)),
                  maxAge(-1) {}
 
 void Synth::setVoices(std::unique_ptr<std::vector<Voice>>&& voices) {
@@ -42,10 +43,24 @@ void Synth::startNote(float f, int v) {
 }
 
 void Synth::endNote(float f) {
-    for (Voice& voice : *voices) {
-        if (voice.getFrequency() == f && !voice.isReleased()) {
-            voice.endNote();
+    int oldest = -1;
+    int oldestIndex = -1;
+    for (auto i = 0; i < VOICE_NB; i++) {
+        auto& currVoice = (*voices)[i];
+        if (currVoice.getFrequency() == f && !currVoice.isReleased() && currVoice.getAge() > oldest) {
+            oldest = currVoice.getAge();
+            oldestIndex = i;
         }
+
+        if (oldest != -1) {
+            (*voices)[oldestIndex].endNote();
+        }
+    }
+}
+
+void Synth::reset() {
+    for (Voice& voice : *voices) {
+        voice.endNote();
     }
 }
 
@@ -63,6 +78,8 @@ void Synth::update(void) {
                 currentSample = max(-1, min(1, currentSample));
                 int16_t val = currentSample * MULT_16;
                 outBlock[channel]->data[i] = val;
+
+                arpeggiator->tick();
             }
             transmit(outBlock[channel], channel);
             release(outBlock[channel]);
