@@ -10,7 +10,7 @@ To configure the synthetizer while it is running, send commands via the Serial i
 Add an if-else block in the createVoices function and choose the waveform and envelope. Increment the `VOICE_SOUND_NB` define constant.
 
 To change the synthetizer voice sound while it is running, use:
-- `voice <v>` --> change the voice sound to v, v must be a valid int between `0` and `VOICE_SOUND_NB`
+- `voice <v>` --> change the voice sound to v, v must be a valid int between `1` and `VOICE_SOUND_NB`
 
 ## Arpeggiator related commands
 - `arp on` --> enable the arpeggiator
