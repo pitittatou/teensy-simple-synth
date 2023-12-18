@@ -6,7 +6,7 @@
 #include <math.h>
 
 ADSREnvelope::ADSREnvelope(int SR, float attackRate, float decayRate, float sustainLevel,
-                           float releaseRate, float targetRatioA, float targetRatioDR) : sampleRate(SR),
+                           float releaseRate, float targetRatioA, float targetRatioDR) : Envelope(SR),
                                                                                          state(State::IDLE) {
     setAttackRate(attackRate);
     setDecayRate(decayRate);
@@ -81,6 +81,7 @@ float ADSREnvelope::tick() {
         case State::IDLE:
             output = 0.0;
             break;
+
         case State::ATTACK:
             output = attackBase + output * attackCoef;
             if (output >= 1.0) {
@@ -88,6 +89,7 @@ float ADSREnvelope::tick() {
                 state = State::DECAY;
             }
             break;
+
         case State::DECAY:
             output = decayBase + output * decayCoef;
             if (output <= sustainLevel) {
@@ -95,9 +97,11 @@ float ADSREnvelope::tick() {
                 state = State::SUSTAIN;
             }
             break;
+
         case State::SUSTAIN:
             output = sustainLevel;
             break;
+
         case State::RELEASE:
             output = releaseBase + output * releaseCoef;
             if (output <= 0.0) {
