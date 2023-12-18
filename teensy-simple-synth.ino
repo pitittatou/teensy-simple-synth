@@ -9,8 +9,9 @@
 #include "src/Voice.h"
 #include "src/envelopes/ADSREnvelope.h"
 #include "src/waveforms/Triangle.h"
+#include "src/waveforms/Square.h"
 
-#define VOICE_SOUND_NB 1
+#define VOICE_SOUND_NB 2
 
 Synth synth;
 AudioOutputI2S out;
@@ -23,11 +24,18 @@ std::unique_ptr<std::vector<Voice>> createVoices(int voiceSound) {
     auto voices = std::make_unique<std::vector<Voice>>();
 
     for (auto i = 0; i < VOICE_NB; i++) {
-        if (voiceSound == 0) {
-            auto waveform = std::make_unique<Triangle>(AUDIO_SAMPLE_RATE_EXACT);
-            auto envelope = std::make_unique<ADSREnvelope>(AUDIO_SAMPLE_RATE_EXACT, 0.2, 0.3, 0.8, 2.0, 0.3, 0.0001);
-            voices->push_back(Voice(AUDIO_SAMPLE_RATE_EXACT, std::move(waveform), std::move(envelope), synth));
+        std::unique_ptr<Waveform> waveform;
+        std::unique_ptr<Envelope> envelope;
+
+        if (voiceSound == 1) {
+            waveform = std::make_unique<Triangle>(AUDIO_SAMPLE_RATE_EXACT);
+            envelope = std::make_unique<ADSREnvelope>(AUDIO_SAMPLE_RATE_EXACT, 0.2, 0.3, 0.8, 2.0, 0.3, 0.0001);
+        } else if (voiceSound == 2) {
+            waveform = std::make_unique<Square>(AUDIO_SAMPLE_RATE_EXACT);
+            envelope = std::make_unique<ADSREnvelope>(AUDIO_SAMPLE_RATE_EXACT, 0.2, 0.3, 0.8, 2.0, 0.3, 0.0001);
         }
+
+        voices->push_back(Voice(AUDIO_SAMPLE_RATE_EXACT, std::move(waveform), std::move(envelope), synth));
     }
     return voices;
 }
@@ -63,7 +71,7 @@ void onControlChange(byte channel, byte control, byte value) {
 void processInput(String input) {
     if (input.startsWith("voice ")) {
         int voiceSound = input.substring(6).toInt();
-        if (voiceSound < VOICE_SOUND_NB && voiceSound >= 0) {
+        if (voiceSound <= VOICE_SOUND_NB && voiceSound >= 1) {
             synth.setVoices(createVoices(voiceSound));
             Serial.print("Switched to voice sound ");
             Serial.println(voiceSound);
@@ -112,7 +120,7 @@ void processInput(String input) {
 }
 
 void setup() {
-    synth.setVoices(createVoices(0));
+    synth.setVoices(createVoices(1));
     arpeggiatorOn = false;
 
     Serial.begin(9600);
