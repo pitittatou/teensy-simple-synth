@@ -1,5 +1,7 @@
 # teensy-simple-synth
 
+Author: Hugo THOMAS
+
 Simple polyphonic synthetizer for the teensy microcontroller, using a modular architecture.
 It also includes a configurable arpeggiator.
 The teensy USB type must be configured as Serial + MIDI.
