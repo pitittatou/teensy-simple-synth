@@ -43,18 +43,18 @@ void Synth::startNote(float f, int v) {
 }
 
 void Synth::endNote(float f) {
-    int oldest = -1;
+    int oldest = voices->size();
     int oldestIndex = -1;
     for (auto i = 0; i < VOICE_NB; i++) {
         auto& currVoice = (*voices)[i];
-        if (currVoice.getFrequency() == f && !currVoice.isReleased() && currVoice.getAge() > oldest) {
+        if (currVoice.getFrequency() == f && !currVoice.isReleased() && currVoice.getAge() < oldest) {
             oldest = currVoice.getAge();
             oldestIndex = i;
         }
+    }
 
-        if (oldest != -1) {
-            (*voices)[oldestIndex].endNote();
-        }
+    if (oldest != static_cast<int>(voices->size())) {
+        (*voices)[oldestIndex].endNote();
     }
 }
 
